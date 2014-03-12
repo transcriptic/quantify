@@ -33,6 +33,8 @@ class Quantity
     for prefix, exponent of prefixes
       conversions[prefix+unit] = { unit, exponent, power: 1 }
 
+  deepcopy = (obj) -> JSON.parse JSON.stringify obj
+
   parse_unit = (u = 'unit') -> conversions[u] ? { unit: u, exponent: 0, power: 1 }
 
   show_unit = ({ unit, exponent }) ->
@@ -70,7 +72,7 @@ class Quantity
     new Quantity @value*diff, units
 
   times: (other_q) ->
-    units = JSON.parse JSON.stringify @units
+    units = deepcopy @units
     val = @value
     other_val = other_q.value
     for unit, {power, exponent} of other_q.units
@@ -91,7 +93,7 @@ class Quantity
   @::divide = @::over = @::per
 
   plus: (other_q) ->
-    units = JSON.parse JSON.stringify @units
+    units = deepcopy @units
     val = @value
     other_val = other_q.value
     for unit, {power, exponent} of other_q.units
@@ -107,13 +109,13 @@ class Quantity
     @plus other_q.negate()
 
   reciprocal: ->
-    units = JSON.parse JSON.stringify @units
+    units = deepcopy @units
     for _, v of units
       v.power = -v.power
     new Quantity 1/@value, units
 
   negate: ->
-    units = JSON.parse JSON.stringify @units
+    units = deepcopy @units
     new Quantity -@value, units
 
   isSame: (other_q) ->
