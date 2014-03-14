@@ -90,6 +90,8 @@ class Quantity
 
   per: (other_q) ->
     @times other_q.reciprocal()
+    
+  # Alias the per() method as divide() and over()
   @::divide = @::over = @::per
 
   plus: (other_q) ->
