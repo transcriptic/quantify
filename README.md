@@ -14,7 +14,16 @@ to micromoles per microliter? Not sure? I'll give you a minute.
 
 ```coffeescript
 Quantity(1, 'nanomole').per(1, 'milliliter')
-    .to(Quantity.Unit('micromole', 'microliter').toString()
+    .to(Quantity.Unit('micromole', 'microliter')).toString()
+# => 0.000001 micromole microliter^-1
+```
+
+or you can predefine a unit you may want to use repeatedly:
+
+```coffeescript
+micromolesPerMicroliter = Quantity.Unit('micromole', 'microliter')
+Quantity(1, 'nanomole').per(1, 'milliliter')
+    .to(micromolesPerMicroliter).toString()
 # => 0.000001 micromole microliter^-1
 ```
 
@@ -47,15 +56,17 @@ a shorthand string like 'milliliter'. Supported units are:
 
 If you specify a string unit that isn't of the form `'{prefix}?{supported
 unit}'`, Quantify will still accept the unit, and will assume that the exponent
-is 0: i.e, that you did not include a prefix. Thus, the string "hipster" will
+is 0: i.e, that you did not include a    prefix. Thus, the string "hipster" will
 yield the expected result, but the string "kilohipster" will not be parsed as
 `{ hipster: { power: 1, exponent: 3 } }`.
 
-All Quantity values are immutable. Instance methods return a new Quantity.
+All `Quantity` values are immutable. Instance methods return a new `Quantity`.
+
+The `Quantity` constructor may be used with or without the `new` operator, with the same result either way.
 
 #### q.to(unit)
 
-Returns a new quantity with the same semantic value as `q`, but in units of
+Returns a new `Quantity` with the same semantic value as `q`, but in units of
 `unit`. `unit` can take string or structure form.
 
 Throws an exception if `unit` doesn't match the dimensions of `q`. You can't
@@ -63,8 +74,10 @@ convert teslas to lumens. (For that matter, you also can't convert liters to
 meters<sup>3</sup>.)
 
 #### q.times(other_q)
+#### q.times(value, unit)
 
-Returns a new quantity which is the result of multiplying `q` by `other_q`.
+Returns a new `Quantity` which is the result of multiplying `q` by `other_q` (another `Quantity` object).
+
 Multiplies the value and the units, so <code>2 meter * 3 second == 6 meter
 &middot; second</code>
 
@@ -72,17 +85,29 @@ If multiplying two values with the same dimensions but differing exponents, the
 more positive exponent will be used. <code>1 milliliter * 1 liter == 0.001
 liter^2</code>
 
-#### q.per(other_q)
-##### or: q.over(other_q), q.divide(other_q)
+If `(value, unit)` arguments are provided instead of `other_q`, a temporary `Quantity`
+object is created for the calculation using those arguments.
+
+#### q.per(other_q), q.over(other_q), q.divide(other_q)
+#### q.per(value, unit), q.over(value, unit), q.divide(value, unit)
 
 Returns the result of `q / other_q`. <code>18 meter / 2 second / 1 second == 9
 meter second<sup>-2</sup></code>.
 
+If `(value, unit)` arguments are provided instead of `other_q`, a temporary `Quantity`
+object is created for the calculation using those arguments.
+
+`.over()` and `.divide()` are aliases for `.per()` and return the same result.
+
 #### q.plus(other_q), q.minus(other_q)
+#### q.plus(value, unit), q.minus(value, unit)
 
 Returns the result of `q ± other_q`. Throws an exception if the units don't
 match. `1 meter + 1 second` doesn't make sense, yo. `1 liter + 1 milliliter` is
 fine, though, and will return `1.001 liter`.
+
+If `(value, unit)` arguments are provided instead of `other_q`, a temporary `Quantity`
+object is created for the calculation using those arguments.
 
 #### q.negate()
 
@@ -93,9 +118,13 @@ Returns `-q`.
 Returns `1/q`.
 
 #### q.isSame(other_q)
+#### q.isSame(value, unit)
 
 Returns true if `q` is identical to `other_q`, in value, dimensions, and
 exponents. `(1 milliliter).isSame(1000 microliter) is false`.
+
+If `(value, unit)` arguments are provided instead of `other_q`, a temporary `Quantity`
+object is created for the calculation using those arguments.
 
 #### q.toString()
 
