@@ -35,6 +35,11 @@ class Quantity
 
   deepcopy = (obj) -> JSON.parse JSON.stringify obj
 
+  # Several Quantity methods support either a single Quantity argument
+  # or a pair of (value,unit) arguments 
+  args_q = (args) ->
+    if args[0] instanceof Quantity then args[0] else new Quantity( args[0], args[1] ) 
+
   parse_unit = (u = 'unit') -> conversions[u] ? { unit: u, exponent: 0, power: 1 }
 
   show_unit = ({ unit, exponent }) ->
@@ -71,7 +76,8 @@ class Quantity
       diff *= Math.pow 10, (exponent - other_exponent) * power
     new Quantity @value*diff, units
 
-  times: (other_q) ->
+  times: () ->
+    other_q = args_q arguments 
     units = deepcopy @units
     val = @value
     other_val = other_q.value
@@ -88,11 +94,15 @@ class Quantity
 
     new Quantity val * other_val, units
 
-  per: (other_q) ->
+  per: () ->
+    other_q = args_q arguments 
     @times other_q.reciprocal()
+    
+  # Alias the per() method as divide() and over()
   @::divide = @::over = @::per
 
-  plus: (other_q) ->
+  plus: () ->
+    other_q = args_q arguments 
     units = deepcopy @units
     val = @value
     other_val = other_q.value
@@ -105,7 +115,8 @@ class Quantity
       units[unit].exponent = Math.max units[unit].exponent, exponent
     new Quantity val + other_val, units
 
-  minus: (other_q) ->
+  minus: () ->
+    other_q = args_q arguments 
     @plus other_q.negate()
 
   reciprocal: ->
@@ -118,7 +129,8 @@ class Quantity
     units = deepcopy @units
     new Quantity -@value, units
 
-  isSame: (other_q) ->
+  isSame: () ->
+    other_q = args_q arguments 
     other_q.value == @value and @unitsAre other_q.units
 
   unitsAre: (other_units) ->
