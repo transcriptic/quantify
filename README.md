@@ -13,7 +13,7 @@ to micromoles per microliter? Not sure? I'll give you a minute.
 
 
 ```coffeescript
-Quantity(1, 'nanomole').per(1, 'milliliter')
+Quantity(1, 'nanomole').per(Quantity(1, 'milliliter'))
     .to(Quantity.Unit('micromole', 'microliter').toString()
 # => 0.000001 micromole microliter^-1
 ```
